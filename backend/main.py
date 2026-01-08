@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
 
-from api.routes import incidents, social, workers, auth, wards
+from api.routes import incidents, social, workers, auth, wards, websocket, analytics
 from database import engine, Base
 
 load_dotenv()
@@ -46,6 +46,8 @@ app.include_router(incidents.router, prefix="/api/incidents", tags=["Incidents"]
 app.include_router(social.router, prefix="/api/social", tags=["Sanskari Sanchay"])
 app.include_router(workers.router, prefix="/api/workers", tags=["Workers"])
 app.include_router(wards.router, prefix="/api/wards", tags=["Wards"])
+app.include_router(websocket.router, prefix="/api", tags=["WebSocket"])
+app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"])
 
 @app.get("/")
 async def root():
