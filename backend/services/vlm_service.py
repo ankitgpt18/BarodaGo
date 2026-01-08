@@ -10,10 +10,11 @@ class VLMService:
     def __init__(self):
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:
-            raise ValueError("GOOGLE_API_KEY not found in environment variables")
-        
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(os.getenv("GEMINI_MODEL", "gemini-1.5-flash"))
+            print("WARNING: GOOGLE_API_KEY not found - AI features will be disabled")
+            self.model = None
+        else:
+            genai.configure(api_key=api_key)
+            self.model = genai.GenerativeModel(os.getenv("GEMINI_MODEL", "gemini-1.5-flash"))
     
     async def analyze_incident(self, image_path: str, gps_coords: tuple = None) -> Dict[str, Any]:
         """
