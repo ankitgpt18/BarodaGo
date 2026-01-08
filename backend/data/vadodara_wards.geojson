@@ -1,0 +1,708 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 1,
+                "name": "Alkapuri",
+                "name_gujarati": "અલકાપુરી",
+                "ward_number": 1,
+                "population_approx": 45000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.17,
+                            22.30
+                        ],
+                        [
+                            73.19,
+                            22.30
+                        ],
+                        [
+                            73.19,
+                            22.32
+                        ],
+                        [
+                            73.17,
+                            22.32
+                        ],
+                        [
+                            73.17,
+                            22.30
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 2,
+                "name": "Akota",
+                "name_gujarati": "અકોટા",
+                "ward_number": 2,
+                "population_approx": 52000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.19,
+                            22.30
+                        ],
+                        [
+                            73.21,
+                            22.30
+                        ],
+                        [
+                            73.21,
+                            22.32
+                        ],
+                        [
+                            73.19,
+                            22.32
+                        ],
+                        [
+                            73.19,
+                            22.30
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 3,
+                "name": "Manjalpur",
+                "name_gujarati": "મંજલપુર",
+                "ward_number": 3,
+                "population_approx": 48000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.15,
+                            22.28
+                        ],
+                        [
+                            73.17,
+                            22.28
+                        ],
+                        [
+                            73.17,
+                            22.30
+                        ],
+                        [
+                            73.15,
+                            22.30
+                        ],
+                        [
+                            73.15,
+                            22.28
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 4,
+                "name": "Productivity",
+                "name_gujarati": "પ્રોડક્ટિવિટી",
+                "ward_number": 4,
+                "population_approx": 35000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.17,
+                            22.28
+                        ],
+                        [
+                            73.19,
+                            22.28
+                        ],
+                        [
+                            73.19,
+                            22.30
+                        ],
+                        [
+                            73.17,
+                            22.30
+                        ],
+                        [
+                            73.17,
+                            22.28
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 5,
+                "name": "Gorwa",
+                "name_gujarati": "ગોરવા",
+                "ward_number": 5,
+                "population_approx": 55000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.15,
+                            22.35
+                        ],
+                        [
+                            73.17,
+                            22.35
+                        ],
+                        [
+                            73.17,
+                            22.37
+                        ],
+                        [
+                            73.15,
+                            22.37
+                        ],
+                        [
+                            73.15,
+                            22.35
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 6,
+                "name": "Karelibaug",
+                "name_gujarati": "કરેલીબાગ",
+                "ward_number": 6,
+                "population_approx": 42000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.19,
+                            22.28
+                        ],
+                        [
+                            73.21,
+                            22.28
+                        ],
+                        [
+                            73.21,
+                            22.30
+                        ],
+                        [
+                            73.19,
+                            22.30
+                        ],
+                        [
+                            73.19,
+                            22.28
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 7,
+                "name": "Raopura",
+                "name_gujarati": "રાવપુરા",
+                "ward_number": 7,
+                "population_approx": 38000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.19,
+                            22.32
+                        ],
+                        [
+                            73.21,
+                            22.32
+                        ],
+                        [
+                            73.21,
+                            22.34
+                        ],
+                        [
+                            73.19,
+                            22.34
+                        ],
+                        [
+                            73.19,
+                            22.32
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 8,
+                "name": "Fatehgunj",
+                "name_gujarati": "ફતેહગંજ",
+                "ward_number": 8,
+                "population_approx": 47000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.17,
+                            22.26
+                        ],
+                        [
+                            73.19,
+                            22.26
+                        ],
+                        [
+                            73.19,
+                            22.28
+                        ],
+                        [
+                            73.17,
+                            22.28
+                        ],
+                        [
+                            73.17,
+                            22.26
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 9,
+                "name": "Sayajigunj",
+                "name_gujarati": "સયાજીગંજ",
+                "ward_number": 9,
+                "population_approx": 41000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.17,
+                            22.32
+                        ],
+                        [
+                            73.19,
+                            22.32
+                        ],
+                        [
+                            73.19,
+                            22.34
+                        ],
+                        [
+                            73.17,
+                            22.34
+                        ],
+                        [
+                            73.17,
+                            22.32
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 10,
+                "name": "Panigate",
+                "name_gujarati": "પાણીગેટ",
+                "ward_number": 10,
+                "population_approx": 36000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.19,
+                            22.26
+                        ],
+                        [
+                            73.21,
+                            22.26
+                        ],
+                        [
+                            73.21,
+                            22.28
+                        ],
+                        [
+                            73.19,
+                            22.28
+                        ],
+                        [
+                            73.19,
+                            22.26
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 11,
+                "name": "Wadi",
+                "name_gujarati": "વાડી",
+                "ward_number": 11,
+                "population_approx": 33000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.21,
+                            22.28
+                        ],
+                        [
+                            73.23,
+                            22.28
+                        ],
+                        [
+                            73.23,
+                            22.30
+                        ],
+                        [
+                            73.21,
+                            22.30
+                        ],
+                        [
+                            73.21,
+                            22.28
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 12,
+                "name": "Tandalja",
+                "name_gujarati": "ટંડલજા",
+                "ward_number": 12,
+                "population_approx": 39000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.21,
+                            22.30
+                        ],
+                        [
+                            73.23,
+                            22.30
+                        ],
+                        [
+                            73.23,
+                            22.32
+                        ],
+                        [
+                            73.21,
+                            22.32
+                        ],
+                        [
+                            73.21,
+                            22.30
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 13,
+                "name": "Harni",
+                "name_gujarati": "હરણી",
+                "ward_number": 13,
+                "population_approx": 44000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.15,
+                            22.32
+                        ],
+                        [
+                            73.17,
+                            22.32
+                        ],
+                        [
+                            73.17,
+                            22.34
+                        ],
+                        [
+                            73.15,
+                            22.34
+                        ],
+                        [
+                            73.15,
+                            22.32
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 14,
+                "name": "Gotri",
+                "name_gujarati": "ગોત્રી",
+                "ward_number": 14,
+                "population_approx": 51000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.19,
+                            22.24
+                        ],
+                        [
+                            73.21,
+                            22.24
+                        ],
+                        [
+                            73.21,
+                            22.26
+                        ],
+                        [
+                            73.19,
+                            22.26
+                        ],
+                        [
+                            73.19,
+                            22.24
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 15,
+                "name": "Bapod",
+                "name_gujarati": "બાપોદ",
+                "ward_number": 15,
+                "population_approx": 37000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.21,
+                            22.24
+                        ],
+                        [
+                            73.23,
+                            22.24
+                        ],
+                        [
+                            73.23,
+                            22.26
+                        ],
+                        [
+                            73.21,
+                            22.26
+                        ],
+                        [
+                            73.21,
+                            22.24
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 16,
+                "name": "Sama",
+                "name_gujarati": "સમા",
+                "ward_number": 16,
+                "population_approx": 58000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.21,
+                            22.35
+                        ],
+                        [
+                            73.23,
+                            22.35
+                        ],
+                        [
+                            73.23,
+                            22.37
+                        ],
+                        [
+                            73.21,
+                            22.37
+                        ],
+                        [
+                            73.21,
+                            22.35
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 17,
+                "name": "Vasna",
+                "name_gujarati": "વસણા",
+                "ward_number": 17,
+                "population_approx": 46000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.17,
+                            22.24
+                        ],
+                        [
+                            73.19,
+                            22.24
+                        ],
+                        [
+                            73.19,
+                            22.26
+                        ],
+                        [
+                            73.17,
+                            22.26
+                        ],
+                        [
+                            73.17,
+                            22.24
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 18,
+                "name": "Waghodia",
+                "name_gujarati": "વાઘોડિયા",
+                "ward_number": 18,
+                "population_approx": 34000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.23,
+                            22.30
+                        ],
+                        [
+                            73.25,
+                            22.30
+                        ],
+                        [
+                            73.25,
+                            22.32
+                        ],
+                        [
+                            73.23,
+                            22.32
+                        ],
+                        [
+                            73.23,
+                            22.30
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "ward_id": 19,
+                "name": "Atladara",
+                "name_gujarati": "અટલાદરા",
+                "ward_number": 19,
+                "population_approx": 40000
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.23,
+                            22.32
+                        ],
+                        [
+                            73.25,
+                            22.32
+                        ],
+                        [
+                            73.25,
+                            22.34
+                        ],
+                        [
+                            73.23,
+                            22.34
+                        ],
+                        [
+                            73.23,
+                            22.32
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}

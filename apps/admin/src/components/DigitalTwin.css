@@ -1,0 +1,128 @@
+.digital-twin-container {
+    position: relative;
+    height: 600px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.map-container {
+    width: 100%;
+    height: 100%;
+}
+
+.map-legend {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    min-width: 150px;
+}
+
+.map-legend h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.legend-dot.severity-high {
+    background: #ef4444;
+}
+
+.legend-dot.severity-medium {
+    background: #f59e0b;
+}
+
+.legend-dot.severity-low {
+    background: #10b981;
+}
+
+/* Incident Markers */
+.incident-marker {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.incident-marker.severity-high {
+    background: rgba(239, 68, 68, 0.9);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+}
+
+.incident-marker.severity-medium {
+    background: rgba(245, 158, 11, 0.9);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+}
+
+.incident-marker.severity-low {
+    background: rgba(16, 185, 129, 0.9);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+}
+
+.incident-marker:hover {
+    transform: scale(1.2);
+    z-index: 10;
+}
+
+/* Popup Styling */
+.incident-popup {
+    padding: 0.5rem;
+}
+
+.incident-popup h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+}
+
+.incident-popup p {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.incident-popup .btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}

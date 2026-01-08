@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # PostgreSQL with PostGIS for spatial queries
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: baroda-postgres
+    environment:
+      POSTGRES_DB: barodago
+      POSTGRES_USER: barodago_user
+      POSTGRES_PASSWORD: barodago_pass_2026
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U barodago_user -d barodago"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and vote tracking
+  redis:
+    image: redis:7-alpine
+    container_name: baroda-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # RabbitMQ for task queue
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: baroda-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: barodago
+      RABBITMQ_DEFAULT_PASS: barodago_rabbit_2026
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ChromaDB for vector embeddings
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: baroda-chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      IS_PERSISTENT: "TRUE"
+      ANONYMIZED_TELEMETRY: "FALSE"
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+  chromadb_data:

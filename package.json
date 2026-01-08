@@ -1,0 +1,28 @@
+{
+  "name": "baroda-go",
+  "version": "1.0.0",
+  "description": "BarodaGo - CivicOS: AI-powered municipal infrastructure platform for Vadodara",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "backend",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:backend": "cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:admin": "cd apps/admin && npm run dev",
+    "dev:all": "concurrently \"npm run dev:backend\" \"npm run dev:admin\"",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "turbo": "^1.11.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
