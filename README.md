@@ -9,7 +9,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://docs.docker.com/compose/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/licenses/MIT)
 
-BarodaGo is a production-grade civic engagement platform that modernizes municipal infrastructure management in Vadodara. It features a triple-app ecosystem — Citizen App, Admin Panel, and Worker App — powered by AI-driven incident triage, gamification mechanics, and community crowdfunding via Razorpay UPI.
+BarodaGo is a civic engagement platform built for Vadodara's municipal infrastructure. It has three apps (Citizen, Admin, Worker) with AI-based incident triage, gamification, and community crowdfunding through Razorpay UPI.
 
 ## Tech Stack
 
