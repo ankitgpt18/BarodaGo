@@ -1,20 +1,42 @@
 export type IssueCategory =
   | 'pothole'
   | 'streetlight'
-  | 'drainage'
+  | 'water_leak'
   | 'garbage'
   | 'stray_cattle'
-  | 'heritage_parks'
-  | 'traffic_signal';
+  | 'live_wires'
+  | 'drainage';
 
 export type IssueStatus =
   | 'reported'
-  | 'verified'
+  | 'ai_verified'
   | 'dispatched'
   | 'in_progress'
   | 'resolved';
 
 export type IssueUrgency = 'normal' | 'high' | 'hazard';
+
+export interface BoundingBox {
+  x: number; // percentage 0-100
+  y: number; // percentage 0-100
+  width: number;
+  height: number;
+  label: string;
+}
+
+export interface AiVisionAnalysis {
+  detectedCategory: IssueCategory;
+  categoryLabel: string;
+  confidence: number;
+  defectSummary: string;
+  technicalDescription: string;
+  urgency: IssueUrgency;
+  hazardScore: number; // 1-100
+  recommendedDepartment: string;
+  estimatedResolutionHours: number;
+  boundingBoxes: BoundingBox[];
+  suggestedTags: string[];
+}
 
 export interface TimelineEvent {
   id: string;
@@ -28,7 +50,7 @@ export interface TimelineEvent {
 
 export interface Issue {
   id: string;
-  trackingNumber: string; // e.g. BDQ-2026-8921
+  trackingNumber: string; // e.g. VMC-BDQ-8921
   title: string;
   description: string;
   category: IssueCategory;
@@ -48,21 +70,47 @@ export interface Issue {
   estimatedTurnaroundHours: number;
   assignedDepartment: string;
   assignedOfficer: string;
-  beforeImageUrl: string;
+  imageUrl: string;
   afterImageUrl?: string;
   timeline: TimelineEvent[];
-  reporterKarmaAwarded: number;
+  aiAnalysis?: AiVisionAnalysis;
+  reporterDetails: {
+    name: string;
+    phone: string;
+    pointsAwarded: number;
+  };
 }
 
-export interface QuestStop {
+export interface RewardItem {
   id: string;
-  name: string;
-  nameGujarati?: string;
-  hint: string;
-  lat: number;
-  lng: number;
-  historicalNote: string;
-  completed?: boolean;
+  title: string;
+  partner: string;
+  pointsCost: number;
+  category: 'transit' | 'food' | 'tax_rebate' | 'culture' | 'eco';
+  description: string;
+  terms: string;
+  imageUrl: string;
+  discountValue: string;
+}
+
+export interface RedeemedVoucher {
+  id: string;
+  rewardId: string;
+  title: string;
+  partner: string;
+  code: string;
+  redeemedAt: string;
+  discountValue: string;
+  status: 'active' | 'used';
+}
+
+export interface CivicQuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+  points: number;
 }
 
 export interface HeritageQuest {
@@ -78,53 +126,17 @@ export interface HeritageQuest {
   karmaReward: number;
   difficulty: 'Easy' | 'Moderate' | 'Scenic Walk';
   imageUrl: string;
-  stops: QuestStop[];
+  stops: Array<{
+    id: string;
+    name: string;
+    hint: string;
+    lat: number;
+    lng: number;
+    historicalNote: string;
+    completed?: boolean;
+  }>;
   joined?: boolean;
   progressPercent?: number;
-}
-
-export interface FoodHygieneSpot {
-  id: string;
-  name: string;
-  area: string;
-  specialty: string;
-  hygieneRating: number; // e.g. 4.8 / 5
-  cleanWaterVerified: boolean;
-  dustbinAvailable: boolean;
-  inspectedDate: string;
-  crowdLevel: 'Low' | 'Moderate' | 'Brisk' | 'Packed';
-  verifiedCount: number;
-  recommendationNote: string;
-  imageUrl: string;
-}
-
-export interface CommunityDrive {
-  id: string;
-  title: string;
-  area: string;
-  wardNumber: number;
-  description: string;
-  targetAmount: number;
-  raisedAmount: number;
-  supportersCount: number;
-  status: 'funding' | 'executing' | 'completed';
-  organizer: string;
-  organizerRole: string;
-  vmcPermitNumber: string;
-  impactMetrics: string;
-  imageUrl: string;
-  userPledged?: boolean;
-}
-
-export interface CitizenChampion {
-  rank: number;
-  name: string;
-  ward: string;
-  karma: number;
-  issuesResolved: number;
-  streakDays: number;
-  badge: string;
-  avatarUrl: string;
 }
 
 export interface WardInfo {

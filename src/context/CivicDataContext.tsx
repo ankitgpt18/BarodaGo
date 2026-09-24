@@ -3,18 +3,18 @@ import {
   Issue,
   IssueCategory,
   IssueStatus,
+  RewardItem,
+  RedeemedVoucher,
+  CivicQuizQuestion,
   HeritageQuest,
-  FoodHygieneSpot,
-  CommunityDrive,
-  CitizenChampion,
-  WardInfo
+  WardInfo,
+  AiVisionAnalysis
 } from '../types';
 import {
   INITIAL_ISSUES,
+  REWARD_ITEMS,
+  CIVIC_QUIZ_QUESTIONS,
   HERITAGE_QUESTS,
-  FOOD_HYGIENE_SPOTS,
-  COMMUNITY_DRIVES,
-  CITIZEN_CHAMPIONS,
   VADODARA_WARDS
 } from '../data/mockData';
 import { sound } from '../utils/sound';
@@ -29,118 +29,126 @@ interface CivicContextType {
   selectedWard: string | 'all';
   setSelectedWard: (ward: string | 'all') => void;
   searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  
-  // Single issue modal inspection
+  setSearchQuery: (q: string) => void;
+
+  // Active Issue
   activeIssue: Issue | null;
   setActiveIssue: (issue: Issue | null) => void;
-  
+
+  // Points & Profile
+  userPoints: number;
+  userName: string;
+  userPhone: string;
+  userWard: string;
+  updateUserProfile: (name: string, phone: string, ward: string) => void;
+
   // Actions
-  reportIssue: (newIssue: Omit<Issue, 'id' | 'trackingNumber' | 'createdAt' | 'upvotes' | 'timeline' | 'corroborationsCount' | 'reporterKarmaAwarded'>) => Issue;
+  reportIssueWithAi: (params: {
+    imageUrl: string;
+    aiAnalysis: AiVisionAnalysis;
+    landmark: string;
+    wardName: string;
+    wardNumber: number;
+    customNote?: string;
+  }) => Issue;
   toggleUpvote: (issueId: string) => void;
   corroborateIssue: (issueId: string) => void;
   getIssueByTrackingNumber: (code: string) => Issue | undefined;
-  
-  // Quests
+
+  // Rewards Store
+  rewards: RewardItem[];
+  redeemedVouchers: RedeemedVoucher[];
+  redeemReward: (reward: RewardItem) => { success: boolean; voucher?: RedeemedVoucher; error?: string };
+
+  // Fun Activities & Quests
+  quizzes: CivicQuizQuestion[];
+  answeredQuizIds: string[];
+  answerQuiz: (quizId: string, selectedIdx: number) => { isCorrect: boolean; pointsAwarded: number };
   quests: HeritageQuest[];
   toggleJoinQuest: (questId: string) => void;
   toggleStopComplete: (questId: string, stopId: string) => void;
-  
-  // Community Drives
-  drives: CommunityDrive[];
-  pledgeToDrive: (driveId: string, amount: number) => void;
-  
-  // Food spots
-  foodSpots: FoodHygieneSpot[];
-  
-  // Leaderboard & Wards
-  champions: CitizenChampion[];
-  wards: WardInfo[];
-  
-  // User profile / karma
-  userKarma: number;
+
+  // Audio & Modals
   soundEnabled: boolean;
   setSoundEnabled: (val: boolean) => void;
-  
-  // UI modals
   isReportModalOpen: boolean;
   setIsReportModalOpen: (open: boolean) => void;
   isLookupModalOpen: boolean;
   setIsLookupModalOpen: (open: boolean) => void;
   lookupPresetCode: string;
   setLookupPresetCode: (code: string) => void;
+  selectedVoucherModal: RedeemedVoucher | null;
+  setSelectedVoucherModal: (v: RedeemedVoucher | null) => void;
 
-  // City pulse metrics
-  metrics: {
-    totalOpen: number;
-    totalResolved: number;
-    avgHours: number;
-    activeWards: number;
-  };
+  // Wards
+  wards: WardInfo[];
 }
 
 const CivicContext = createContext<CivicContextType | undefined>(undefined);
 
-const ISSUES_STORAGE_KEY = 'barodago_issues_v2';
-const KARMA_STORAGE_KEY = 'barodago_karma_v2';
-const QUESTS_STORAGE_KEY = 'barodago_quests_v2';
-const DRIVES_STORAGE_KEY = 'barodago_drives_v2';
+const ISSUES_KEY = 'barodago_issues_v3';
+const POINTS_KEY = 'barodago_points_v3';
+const VOUCHERS_KEY = 'barodago_vouchers_v3';
+const PROFILE_KEY = 'barodago_profile_v3';
+const QUIZ_KEY = 'barodago_quiz_v3';
 
 export const CivicDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [issues, setIssues] = useState<Issue[]>(() => {
     try {
-      const saved = localStorage.getItem(ISSUES_STORAGE_KEY);
+      const saved = localStorage.getItem(ISSUES_KEY);
       if (saved) return JSON.parse(saved);
-    } catch {
-      // fallback to initial
-    }
+    } catch {}
     return INITIAL_ISSUES;
   });
 
-  const [quests, setQuests] = useState<HeritageQuest[]>(() => {
+  const [userPoints, setUserPoints] = useState<number>(() => {
     try {
-      const saved = localStorage.getItem(QUESTS_STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // fallback
-    }
-    return HERITAGE_QUESTS;
+      const saved = localStorage.getItem(POINTS_KEY);
+      if (saved) return parseInt(saved, 10);
+    } catch {}
+    return 245;
   });
 
-  const [drives, setDrives] = useState<CommunityDrive[]>(() => {
+  const [userProfile, setUserProfile] = useState<{ name: string; phone: string; ward: string }>(() => {
     try {
-      const saved = localStorage.getItem(DRIVES_STORAGE_KEY);
+      const saved = localStorage.getItem(PROFILE_KEY);
       if (saved) return JSON.parse(saved);
-    } catch {
-      // fallback
-    }
-    return COMMUNITY_DRIVES;
+    } catch {}
+    return { name: 'Ankit Gupta', phone: '+91 98250 18400', ward: 'Alkapuri (Ward 1)' };
   });
 
-  const [foodSpots] = useState<FoodHygieneSpot[]>(FOOD_HYGIENE_SPOTS);
-  const [champions] = useState<CitizenChampion[]>(CITIZEN_CHAMPIONS);
+  const [redeemedVouchers, setRedeemedVouchers] = useState<RedeemedVoucher[]>(() => {
+    try {
+      const saved = localStorage.getItem(VOUCHERS_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [];
+  });
+
+  const [answeredQuizIds, setAnsweredQuizIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(QUIZ_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [];
+  });
+
+  const [quests, setQuests] = useState<HeritageQuest[]>(HERITAGE_QUESTS);
+  const [rewards] = useState<RewardItem[]>(REWARD_ITEMS);
+  const [quizzes] = useState<CivicQuizQuestion[]>(CIVIC_QUIZ_QUESTIONS);
   const [wards] = useState<WardInfo[]>(VADODARA_WARDS);
 
-  const [userKarma, setUserKarma] = useState<number>(() => {
-    try {
-      const saved = localStorage.getItem(KARMA_STORAGE_KEY);
-      if (saved) return parseInt(saved, 10);
-    } catch {
-      // fallback
-    }
-    return 185;
-  });
-
-  const [soundEnabled, setSoundEnabledState] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<IssueCategory | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<IssueStatus | 'all'>('all');
   const [selectedWard, setSelectedWard] = useState<string | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const [activeIssue, setActiveIssue] = useState<Issue | null>(null);
+  const [soundEnabled, setSoundEnabledState] = useState<boolean>(true);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
   const [isLookupModalOpen, setIsLookupModalOpen] = useState<boolean>(false);
   const [lookupPresetCode, setLookupPresetCode] = useState<string>('');
+  const [selectedVoucherModal, setSelectedVoucherModal] = useState<RedeemedVoucher | null>(null);
 
   const setSoundEnabled = (val: boolean) => {
     setSoundEnabledState(val);
@@ -149,119 +157,151 @@ export const CivicDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     try {
-      localStorage.setItem(ISSUES_STORAGE_KEY, JSON.stringify(issues));
-    } catch {
-      // localStorage quote limit safe catch
-    }
+      localStorage.setItem(ISSUES_KEY, JSON.stringify(issues));
+    } catch {}
   }, [issues]);
 
   useEffect(() => {
     try {
-      localStorage.setItem(KARMA_STORAGE_KEY, userKarma.toString());
-    } catch {
-      // safe
-    }
-  }, [userKarma]);
+      localStorage.setItem(POINTS_KEY, userPoints.toString());
+    } catch {}
+  }, [userPoints]);
 
   useEffect(() => {
     try {
-      localStorage.setItem(QUESTS_STORAGE_KEY, JSON.stringify(quests));
-    } catch {
-      // safe
-    }
-  }, [quests]);
+      localStorage.setItem(VOUCHERS_KEY, JSON.stringify(redeemedVouchers));
+    } catch {}
+  }, [redeemedVouchers]);
 
   useEffect(() => {
     try {
-      localStorage.setItem(DRIVES_STORAGE_KEY, JSON.stringify(drives));
-    } catch {
-      // safe
-    }
-  }, [drives]);
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile));
+    } catch {}
+  }, [userProfile]);
 
-  // Upvote an issue
+  useEffect(() => {
+    try {
+      localStorage.setItem(QUIZ_KEY, JSON.stringify(answeredQuizIds));
+    } catch {}
+  }, [answeredQuizIds]);
+
+  const updateUserProfile = (name: string, phone: string, ward: string) => {
+    setUserProfile({ name, phone, ward });
+  };
+
+  // Upvote
   const toggleUpvote = (issueId: string) => {
     sound.playClick();
     setIssues((prev) =>
-      prev.map((item) => {
-        if (item.id === issueId) {
-          const userAlreadyUpvoted = !!item.userUpvoted;
+      prev.map((i) => {
+        if (i.id === issueId) {
+          const userAlready = !!i.userUpvoted;
           return {
-            ...item,
-            upvotes: userAlreadyUpvoted ? item.upvotes - 1 : item.upvotes + 1,
-            userUpvoted: !userAlreadyUpvoted
+            ...i,
+            upvotes: userAlready ? i.upvotes - 1 : i.upvotes + 1,
+            userUpvoted: !userAlready
           };
         }
-        return item;
+        return i;
       })
     );
   };
 
-  // Corroborate an issue ("I also face this")
+  // Corroborate
   const corroborateIssue = (issueId: string) => {
     sound.playSuccess();
     setIssues((prev) =>
-      prev.map((item) => {
-        if (item.id === issueId) {
+      prev.map((i) => {
+        if (i.id === issueId) {
           return {
-            ...item,
-            corroborationsCount: item.corroborationsCount + 1,
-            upvotes: item.upvotes + 1,
+            ...i,
+            corroborationsCount: i.corroborationsCount + 1,
+            upvotes: i.upvotes + 1,
             userUpvoted: true
           };
         }
-        return item;
+        return i;
       })
     );
-    setUserKarma((k) => k + 10);
+    setUserPoints((p) => p + 15);
   };
 
-  // Report new issue
-  const reportIssue = (
-    newIssueData: Omit<
-      Issue,
-      'id' | 'trackingNumber' | 'createdAt' | 'upvotes' | 'timeline' | 'corroborationsCount' | 'reporterKarmaAwarded'
-    >
-  ): Issue => {
+  // Report Issue With AI
+  const reportIssueWithAi = ({
+    imageUrl,
+    aiAnalysis,
+    landmark,
+    wardName,
+    wardNumber,
+    customNote
+  }: {
+    imageUrl: string;
+    aiAnalysis: AiVisionAnalysis;
+    landmark: string;
+    wardName: string;
+    wardNumber: number;
+    customNote?: string;
+  }): Issue => {
     sound.playSuccess();
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const trackingNumber = `BDQ-2026-${randomSuffix}`;
+    const trackingNumber = `VMC-BDQ-${randomSuffix}`;
     const id = `issue-${Date.now()}`;
     const nowIso = new Date().toISOString();
+    const pointsAwarded = aiAnalysis.hazardScore > 80 ? 75 : 50;
 
-    const createdIssue: Issue = {
-      ...newIssueData,
+    const newIssue: Issue = {
       id,
       trackingNumber,
-      createdAt: nowIso,
+      title: `${aiAnalysis.categoryLabel} near ${landmark}`,
+      description: customNote || aiAnalysis.defectSummary,
+      category: aiAnalysis.detectedCategory,
+      wardName,
+      wardNumber,
+      landmark,
+      address: `${landmark}, Ward ${wardNumber}, Vadodara, Gujarat`,
+      lat: 22.3072 + (Math.random() - 0.5) * 0.04,
+      lng: 73.1812 + (Math.random() - 0.5) * 0.04,
+      status: 'ai_verified',
+      urgency: aiAnalysis.urgency,
       upvotes: 1,
       userUpvoted: true,
       corroborationsCount: 1,
-      reporterKarmaAwarded: 45,
+      createdAt: nowIso,
+      estimatedTurnaroundHours: aiAnalysis.estimatedResolutionHours,
+      assignedDepartment: aiAnalysis.recommendedDepartment,
+      assignedOfficer: `Er. VMC Ward ${wardNumber} Lead`,
+      imageUrl,
       timeline: [
         {
           id: `t-${Date.now()}-1`,
           timestamp: 'Just now',
           status: 'reported',
-          note: 'Logged via BarodaGO Citizen Portal with geotagged coordinates.',
-          actor: 'Citizen App',
+          note: 'Photo captured and geolocated by citizen via BarodaGO.',
+          actor: userProfile.name,
           actorRole: 'Citizen Submitter',
           badge: 'Logged'
         },
         {
           id: `t-${Date.now()}-2`,
-          timestamp: 'In 3 mins',
-          status: 'verified',
-          note: `Queued for Ward ${newIssueData.wardNumber} (${newIssueData.wardName}) municipal dispatch.`,
-          actor: 'VMC Smart Routing Desk',
-          actorRole: 'Automated Dispatch'
+          timestamp: '1 second ago',
+          status: 'ai_verified',
+          note: `AI Vision classified defect: ${aiAnalysis.categoryLabel} (${aiAnalysis.confidence.toFixed(1)}% confidence). Auto-routed to ${aiAnalysis.recommendedDepartment}.`,
+          actor: 'BarodaGO Vision AI',
+          actorRole: 'Automated Inspection',
+          badge: 'AI Verified'
         }
-      ]
+      ],
+      aiAnalysis,
+      reporterDetails: {
+        name: userProfile.name,
+        phone: userProfile.phone,
+        pointsAwarded
+      }
     };
 
-    setIssues((prev) => [createdIssue, ...prev]);
-    setUserKarma((prev) => prev + 45);
-    return createdIssue;
+    setIssues((prev) => [newIssue, ...prev]);
+    setUserPoints((prev) => prev + pointsAwarded);
+    return newIssue;
   };
 
   const getIssueByTrackingNumber = (code: string): Issue | undefined => {
@@ -269,7 +309,51 @@ export const CivicDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return issues.find((i) => i.trackingNumber.toUpperCase() === clean);
   };
 
-  // Toggle Quest Join
+  // Redeem Reward
+  const redeemReward = (reward: RewardItem): { success: boolean; voucher?: RedeemedVoucher; error?: string } => {
+    if (userPoints < reward.pointsCost) {
+      return { success: false, error: `Insufficient points! You need ${reward.pointsCost - userPoints} more points.` };
+    }
+
+    sound.playSuccess();
+    const voucherCode = `BDQ-${reward.category.toUpperCase().slice(0, 3)}-${Math.floor(10000 + Math.random() * 90000)}`;
+    const newVoucher: RedeemedVoucher = {
+      id: `vouch-${Date.now()}`,
+      rewardId: reward.id,
+      title: reward.title,
+      partner: reward.partner,
+      code: voucherCode,
+      redeemedAt: new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }),
+      discountValue: reward.discountValue,
+      status: 'active'
+    };
+
+    setUserPoints((p) => p - reward.pointsCost);
+    setRedeemedVouchers((prev) => [newVoucher, ...prev]);
+    return { success: true, voucher: newVoucher };
+  };
+
+  // Answer Quiz
+  const answerQuiz = (quizId: string, selectedIdx: number) => {
+    const quiz = quizzes.find((q) => q.id === quizId);
+    if (!quiz || answeredQuizIds.includes(quizId)) {
+      return { isCorrect: false, pointsAwarded: 0 };
+    }
+
+    const isCorrect = selectedIdx === quiz.correctIndex;
+    setAnsweredQuizIds((prev) => [...prev, quizId]);
+
+    if (isCorrect) {
+      sound.playSuccess();
+      setUserPoints((p) => p + quiz.points);
+      return { isCorrect: true, pointsAwarded: quiz.points };
+    } else {
+      sound.playClick();
+      return { isCorrect: false, pointsAwarded: 0 };
+    }
+  };
+
+  // Quests
   const toggleJoinQuest = (questId: string) => {
     sound.playClick();
     setQuests((prev) =>
@@ -287,51 +371,24 @@ export const CivicDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     );
   };
 
-  // Toggle Stop Complete
   const toggleStopComplete = (questId: string, stopId: string) => {
     sound.playSuccess();
     setQuests((prev) =>
       prev.map((q) => {
         if (q.id === questId) {
-          const updatedStops = q.stops.map((st) => {
-            if (st.id === stopId) {
-              return { ...st, completed: !st.completed };
-            }
-            return st;
-          });
-          const completedCount = updatedStops.filter((st) => st.completed).length;
-          const percent = Math.round((completedCount / updatedStops.length) * 100);
+          const updated = q.stops.map((st) => (st.id === stopId ? { ...st, completed: !st.completed } : st));
+          const completedCount = updated.filter((st) => st.completed).length;
+          const percent = Math.round((completedCount / updated.length) * 100);
           return {
             ...q,
-            stops: updatedStops,
+            stops: updated,
             progressPercent: percent
           };
         }
         return q;
       })
     );
-    setUserKarma((prev) => prev + 25);
-  };
-
-  // Pledge to Community Drive
-  const pledgeToDrive = (driveId: string, amount: number) => {
-    sound.playSuccess();
-    setDrives((prev) =>
-      prev.map((d) => {
-        if (d.id === driveId) {
-          const newRaised = Math.min(d.targetAmount, d.raisedAmount + amount);
-          return {
-            ...d,
-            raisedAmount: newRaised,
-            supportersCount: d.supportersCount + (d.userPledged ? 0 : 1),
-            userPledged: true,
-            status: newRaised >= d.targetAmount ? 'completed' : 'funding'
-          };
-        }
-        return d;
-      })
-    );
-    setUserKarma((prev) => prev + Math.floor(amount / 50));
+    setUserPoints((p) => p + 25);
   };
 
   // Filtered issues
@@ -348,15 +405,10 @@ export const CivicDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchText = `${issue.title} ${issue.description} ${issue.landmark} ${issue.wardName} ${issue.trackingNumber}`.toLowerCase();
-      if (!matchText.includes(q)) {
-        return false;
-      }
+      if (!matchText.includes(q)) return false;
     }
     return true;
   });
-
-  const totalOpen = issues.filter((i) => i.status !== 'resolved').length;
-  const totalResolved = issues.filter((i) => i.status === 'resolved').length;
 
   return (
     <CivicContext.Provider
@@ -373,19 +425,24 @@ export const CivicDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setSearchQuery,
         activeIssue,
         setActiveIssue,
-        reportIssue,
+        userPoints,
+        userName: userProfile.name,
+        userPhone: userProfile.phone,
+        userWard: userProfile.ward,
+        updateUserProfile,
+        reportIssueWithAi,
         toggleUpvote,
         corroborateIssue,
         getIssueByTrackingNumber,
+        rewards,
+        redeemedVouchers,
+        redeemReward,
+        quizzes,
+        answeredQuizIds,
+        answerQuiz,
         quests,
         toggleJoinQuest,
         toggleStopComplete,
-        drives,
-        pledgeToDrive,
-        foodSpots,
-        champions,
-        wards,
-        userKarma,
         soundEnabled,
         setSoundEnabled,
         isReportModalOpen,
@@ -394,12 +451,9 @@ export const CivicDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setIsLookupModalOpen,
         lookupPresetCode,
         setLookupPresetCode,
-        metrics: {
-          totalOpen,
-          totalResolved,
-          avgHours: 24.8,
-          activeWards: 19
-        }
+        selectedVoucherModal,
+        setSelectedVoucherModal,
+        wards
       }}
     >
       {children}
@@ -408,9 +462,7 @@ export const CivicDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 };
 
 export const useCivicData = () => {
-  const context = useContext(CivicContext);
-  if (!context) {
-    throw new Error('useCivicData must be used within a CivicDataProvider');
-  }
-  return context;
+  const ctx = useContext(CivicContext);
+  if (!ctx) throw new Error('useCivicData must be used within CivicDataProvider');
+  return ctx;
 };

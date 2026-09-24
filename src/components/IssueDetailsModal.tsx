@@ -142,7 +142,7 @@ export const IssueDetailsModal: React.FC<IssueDetailsModalProps> = ({
               <div className="space-y-1">
                 <div className="relative h-48 rounded-xl overflow-hidden border border-neutral-800 bg-neutral-950">
                   <img
-                    src={issue.beforeImageUrl}
+                    src={issue.imageUrl}
                     alt="Initial citizen report"
                     className="h-full w-full object-cover"
                   />

@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Camera,
+  Scan,
   MapPin,
   Clock,
   CheckCircle2,
@@ -21,33 +21,32 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMap }) => {
   const {
-    metrics,
+    issues,
     selectedCategory,
     setSelectedCategory,
     selectedWard,
     setSelectedWard,
     searchQuery,
     setSearchQuery,
-    setIsReportModalOpen,
-    setIsLookupModalOpen,
-    setLookupPresetCode,
     wards
   } = useCivicData();
+
+  const totalOpen = issues.filter((i) => i.status !== 'resolved').length;
+  const totalResolved = issues.filter((i) => i.status === 'resolved').length;
 
   const categories: Array<{ id: IssueCategory | 'all'; label: string }> = [
     { id: 'all', label: 'All Incidents' },
     { id: 'pothole', label: 'Roads & Potholes' },
     { id: 'streetlight', label: 'Streetlights' },
-    { id: 'drainage', label: 'Drainage & Water' },
+    { id: 'water_leak', label: 'Water Leak' },
     { id: 'garbage', label: 'Waste Dumps' },
-    { id: 'stray_cattle', label: 'Cattle & Hazards' },
-    { id: 'heritage_parks', label: 'Parks & Heritage' },
-    { id: 'traffic_signal', label: 'Signals & Traffic' }
+    { id: 'stray_cattle', label: 'Cattle Hazard' },
+    { id: 'live_wires', label: 'Live Wires' },
+    { id: 'drainage', label: 'Drainage & Gutter' }
   ];
 
   return (
     <section className="relative overflow-hidden border-b border-neutral-800 bg-gradient-to-b from-[#0D121D] via-[#0A0E17] to-[#080B12] pt-8 pb-10">
-      {/* Background subtle geometric civic grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293d0f_1px,transparent_1px),linear-gradient(to_bottom,#1f293d0f_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
@@ -57,72 +56,35 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMap }) => {
             <span className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse" />
             <span className="font-semibold text-neutral-200">Vadodara Civic OS</span>
             <span className="text-neutral-500">•</span>
-            <span className="text-neutral-400">Open Public Demonstration</span>
+            <span className="text-neutral-400">AI Vision Computer Dispatch</span>
           </div>
 
           <div className="flex items-center space-x-2 text-xs font-mono text-neutral-400">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
-            <span>Live SLA: 24.8 hrs average response time across 19 Wards</span>
+            <span>Live SLA: 24h average resolution across 19 Wards</span>
           </div>
         </div>
 
         {/* Hero main statement */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-8">
           <div className="lg:col-span-8">
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              Fix our city.{' '}
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+              Report Civic Issues.{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-400">
-                Direct to Ward Engineers.
+                AI Analyzes & Dispatches.
               </span>
             </h1>
             <p className="mt-4 text-base sm:text-lg text-neutral-300 max-w-2xl leading-relaxed">
-              Report road craters, failed streetlights, and drainage overflows straight to your VMC ward executive. No bureaucratic maze, no black box. Track work crews live, corroborate neighbor reports, and celebrate Vadodara’s heritage.
+              Upload photos of potholes, stray cattle on flyovers, exposed wires, leaking pipes, or garbage dumps. Our computer vision model classifies defect severity, extracts GPS coordinates, and dispatches directly to VMC ward executive engineers.
             </p>
-
-            {/* Quick action buttons */}
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  setIsReportModalOpen(true);
-                }}
-                className="inline-flex items-center space-x-2 rounded-xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-orange-950/40 hover:bg-orange-500 active:scale-95 transition-all border border-orange-400/40"
-              >
-                <Camera className="h-4 w-4" />
-                <span>Report Civic Issue Now</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  onOpenMap();
-                }}
-                className="inline-flex items-center space-x-2 rounded-xl border border-neutral-700 bg-neutral-900/90 px-4 py-3 text-sm font-semibold text-neutral-200 hover:bg-neutral-800 hover:border-neutral-600 transition-all"
-              >
-                <MapPin className="h-4 w-4 text-sky-400" />
-                <span>Inspect Vadodara Live Map</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  setLookupPresetCode('BDQ-2026-8921');
-                  setIsLookupModalOpen(true);
-                }}
-                className="inline-flex items-center space-x-2 text-xs font-mono text-neutral-400 hover:text-amber-400 px-3 py-2 underline underline-offset-4 transition-colors"
-              >
-                <span>Track #BDQ-2026-8921</span>
-                <ArrowRight className="h-3 w-3" />
-              </button>
-            </div>
           </div>
 
-          {/* Quick Stats Panel */}
+          {/* Quick Stats */}
           <div className="lg:col-span-4">
             <div className="rounded-2xl border border-neutral-800 bg-[#0F141F]/90 p-5 shadow-2xl backdrop-blur-sm">
               <div className="flex items-center justify-between pb-3 border-b border-neutral-800/80 mb-4">
                 <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                  Vadodara City Pulse
+                  Vadodara Live Statistics
                 </span>
                 <span className="flex items-center text-xs font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/50">
                   <Flame className="h-3 w-3 mr-1 text-emerald-400" />
@@ -137,7 +99,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMap }) => {
                     <span>Open Issues</span>
                   </div>
                   <div className="text-2xl font-bold font-mono text-white">
-                    {metrics.totalOpen}
+                    {totalOpen}
                   </div>
                   <div className="text-[11px] text-neutral-400 mt-0.5">
                     Under active triage
@@ -147,23 +109,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMap }) => {
                 <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/50 p-3">
                   <div className="flex items-center space-x-1.5 text-neutral-400 text-xs mb-1">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                    <span>Fixed & Verified</span>
+                    <span>Fixed & Audited</span>
                   </div>
                   <div className="text-2xl font-bold font-mono text-emerald-400">
-                    {metrics.totalResolved}
+                    {totalResolved}
                   </div>
                   <div className="text-[11px] text-neutral-400 mt-0.5">
-                    Audited with photos
+                    With verification photos
                   </div>
                 </div>
 
                 <div className="rounded-xl border border-neutral-800/80 bg-neutral-900/50 p-3">
                   <div className="flex items-center space-x-1.5 text-neutral-400 text-xs mb-1">
                     <TrendingUp className="h-3.5 w-3.5 text-sky-400" />
-                    <span>Avg Turnaround</span>
+                    <span>Avg Response</span>
                   </div>
                   <div className="text-2xl font-bold font-mono text-white">
-                    {metrics.avgHours}h
+                    24h
                   </div>
                   <div className="text-[11px] text-neutral-400 mt-0.5">
                     First crew dispatch
@@ -179,7 +141,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMap }) => {
                     19 / 19
                   </div>
                   <div className="text-[11px] text-neutral-400 mt-0.5">
-                    Full city coverage
+                    Vadodara coverage
                   </div>
                 </div>
               </div>
@@ -190,15 +152,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMap }) => {
         {/* Filter & Search Bar */}
         <div className="rounded-2xl border border-neutral-800 bg-[#101622]/90 p-3.5 sm:p-4 shadow-xl">
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
-            {/* Search Input */}
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search road, landmark, or BDQ ticket number (e.g. Alkapuri, Dairy Den, Gotri)..."
-                className="w-full rounded-xl border border-neutral-700/80 bg-neutral-900/90 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white placeholder-neutral-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                placeholder="Search road, landmark, or VMC ticket number (e.g. Alkapuri, Dairy Den, Gotri)..."
+                className="w-full rounded-xl border border-neutral-700/80 bg-neutral-900/90 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white placeholder-neutral-500 focus:border-amber-500 focus:outline-none"
               />
               {searchQuery && (
                 <button
@@ -210,7 +171,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMap }) => {
               )}
             </div>
 
-            {/* Ward Selector */}
             <div className="flex items-center space-x-2">
               <div className="relative min-w-[180px]">
                 <select

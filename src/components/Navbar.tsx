@@ -1,14 +1,14 @@
 import React from 'react';
 import {
+  Scan,
   Compass,
   MapPin,
-  Camera,
+  Gift,
+  Sparkles,
   Search,
   Volume2,
   VolumeX,
-  Award,
-  Sparkles,
-  ShieldCheck
+  Coins
 } from 'lucide-react';
 import { useCivicData } from '../context/CivicDataContext';
 import { sound } from '../utils/sound';
@@ -20,10 +20,9 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const {
-    userKarma,
+    userPoints,
     soundEnabled,
     setSoundEnabled,
-    setIsReportModalOpen,
     setIsLookupModalOpen,
     setLookupPresetCode
   } = useCivicData();
@@ -34,213 +33,199 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-neutral-800/80 bg-[#0B0F17]/90 backdrop-blur-md">
-      {/* Top micro-bar: Municipal service status */}
+    <header className="sticky top-0 z-40 w-full border-b border-neutral-800/80 bg-[#0B0F17]/95 backdrop-blur-md">
+      {/* Top micro municipal service status */}
       <div className="border-b border-neutral-800/50 bg-[#080B11] px-4 py-1.5 text-xs text-neutral-400">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span className="flex items-center space-x-1.5 font-medium text-neutral-300">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
-              </span>
-              <span>Vadodara Municipal Corporation (VMC) Civic Network</span>
+          <div className="flex items-center space-x-2">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            </span>
+            <span className="font-medium text-neutral-300">
+              Vadodara Municipal Corporation (VMC) Civic Network
             </span>
             <span className="hidden sm:inline-block text-neutral-600">•</span>
             <span className="hidden sm:inline-block text-neutral-400 font-mono text-[11px]">
-              19 Wards Active • East, West, North & South Zones Online
+              AI Vision Automated Triage Active across 19 Wards
             </span>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 text-[11px] font-mono">
             <button
               onClick={() => {
-                setLookupPresetCode('BDQ-2026-8921');
-                setIsLookupModalOpen(true);
+                setLookupPresetCode('VMC-BDQ-8921');
+                handleTabChange('track');
               }}
-              className="text-neutral-400 hover:text-emerald-400 font-mono text-[11px] underline underline-offset-2 transition-colors"
+              className="text-neutral-400 hover:text-amber-400 transition-colors hidden sm:inline"
             >
-              Demo Ticket: BDQ-2026-8921
+              Demo Ticket: VMC-BDQ-8921
             </button>
-            <span className="text-neutral-700">|</span>
+            <span className="text-neutral-700 hidden sm:inline">|</span>
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              title={soundEnabled ? 'Disable audio cues' : 'Enable audio cues'}
-              className="flex items-center space-x-1 text-neutral-400 hover:text-neutral-200 transition-colors"
+              title={soundEnabled ? 'Mute sound' : 'Enable sound'}
+              className="flex items-center space-x-1 text-neutral-400 hover:text-white transition-colors"
             >
               {soundEnabled ? (
                 <Volume2 className="h-3.5 w-3.5 text-neutral-400" />
               ) : (
                 <VolumeX className="h-3.5 w-3.5 text-neutral-600" />
               )}
-              <span className="hidden md:inline text-[10px] uppercase font-mono tracking-wider">
-                {soundEnabled ? 'Sound ON' : 'Mute'}
+              <span className="text-[10px] uppercase font-mono">
+                {soundEnabled ? 'Sound' : 'Muted'}
               </span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main navigation */}
+      {/* Main Bar */}
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-        {/* Brand identity */}
-        <div className="flex items-center space-x-3">
-          <div
-            onClick={() => handleTabChange('feed')}
-            className="flex items-center space-x-2.5 cursor-pointer group"
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white font-black text-sm tracking-tight shadow-md shadow-orange-950/40 border border-orange-400/30 group-hover:scale-105 transition-transform">
-              BDQ
+        {/* Brand */}
+        <div
+          onClick={() => handleTabChange('scanner')}
+          className="flex items-center space-x-2.5 cursor-pointer group"
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-600 text-white font-black text-sm tracking-tight shadow-md border border-orange-400/30 group-hover:scale-105 transition-transform">
+            BDQ
+          </div>
+          <div>
+            <div className="flex items-center space-x-1.5">
+              <span className="font-bold text-base tracking-tight text-white group-hover:text-amber-400 transition-colors">
+                BarodaGO
+              </span>
+              <span className="rounded bg-neutral-800 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-amber-400 border border-amber-500/20">
+                AI CITIZEN OS
+              </span>
             </div>
-            <div>
-              <div className="flex items-center space-x-1.5">
-                <span className="font-bold text-base tracking-tight text-white group-hover:text-amber-400 transition-colors">
-                  BarodaGO
-                </span>
-                <span className="rounded bg-neutral-800 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-amber-400 border border-amber-500/20">
-                  CITIZEN
-                </span>
-              </div>
-              <p className="text-[11px] text-neutral-400 font-medium hidden sm:block">
-                Vadodara Civic OS & Neighborhood Radar
-              </p>
-            </div>
+            <p className="text-[11px] text-neutral-400 font-medium hidden sm:block">
+              Vision Defect Triage & Points Redemption
+            </p>
           </div>
         </div>
 
-        {/* Navigation tabs */}
-        <nav className="hidden lg:flex items-center space-x-1 bg-neutral-900/60 p-1 rounded-xl border border-neutral-800">
+        {/* Navigation Tabs */}
+        <nav className="hidden lg:flex items-center space-x-1 bg-neutral-900/70 p-1 rounded-2xl border border-neutral-800">
+          <button
+            onClick={() => handleTabChange('scanner')}
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'scanner'
+                ? 'bg-orange-600 text-white shadow-md'
+                : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <Scan className="h-3.5 w-3.5" />
+            <span>AI Vision Report</span>
+          </button>
+
           <button
             onClick={() => handleTabChange('feed')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'feed'
-                ? 'bg-neutral-800 text-white shadow-sm border border-neutral-700'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40'
+                ? 'bg-neutral-800 text-white border border-neutral-700'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
             <Compass className="h-3.5 w-3.5 text-amber-400" />
-            <span>Civic Radar</span>
+            <span>Civic Feed</span>
           </button>
 
           <button
             onClick={() => handleTabChange('map')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'map'
-                ? 'bg-neutral-800 text-white shadow-sm border border-neutral-700'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40'
+                ? 'bg-neutral-800 text-white border border-neutral-700'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
             <MapPin className="h-3.5 w-3.5 text-sky-400" />
-            <span>Interactive Map</span>
+            <span>Vadodara GIS Map</span>
           </button>
 
           <button
-            onClick={() => handleTabChange('quests')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              activeTab === 'quests'
-                ? 'bg-neutral-800 text-white shadow-sm border border-neutral-700'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40'
+            onClick={() => handleTabChange('rewards')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'rewards'
+                ? 'bg-neutral-800 text-white border border-neutral-700'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
-            <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Heritage Quests</span>
+            <Gift className="h-3.5 w-3.5 text-emerald-400" />
+            <span>Redeem Store</span>
           </button>
 
           <button
-            onClick={() => handleTabChange('food')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              activeTab === 'food'
-                ? 'bg-neutral-800 text-white shadow-sm border border-neutral-700'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40'
+            onClick={() => handleTabChange('activities')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'activities'
+                ? 'bg-neutral-800 text-white border border-neutral-700'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
-            <ShieldCheck className="h-3.5 w-3.5 text-rose-400" />
-            <span>Food & Hygiene</span>
+            <Sparkles className="h-3.5 w-3.5 text-yellow-400" />
+            <span>Fun & Quests</span>
           </button>
 
           <button
-            onClick={() => handleTabChange('community')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              activeTab === 'community'
-                ? 'bg-neutral-800 text-white shadow-sm border border-neutral-700'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40'
+            onClick={() => handleTabChange('track')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === 'track'
+                ? 'bg-neutral-800 text-white border border-neutral-700'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
-            <span>Micro-Drives</span>
-          </button>
-
-          <button
-            onClick={() => handleTabChange('leaderboard')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              activeTab === 'leaderboard'
-                ? 'bg-neutral-800 text-white shadow-sm border border-neutral-700'
-                : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40'
-            }`}
-          >
-            <Award className="h-3.5 w-3.5 text-yellow-400" />
-            <span>Champions</span>
+            <Search className="h-3.5 w-3.5 text-neutral-400" />
+            <span>Track Timeline</span>
           </button>
         </nav>
 
-        {/* Action Controls */}
+        {/* Right side: Points & Quick Actions */}
         <div className="flex items-center space-x-2.5">
-          {/* Quick Ticket Lookup */}
+          {/* Points Pill (Clickable -> opens Redeem store) */}
           <button
-            onClick={() => {
-              sound.playClick();
-              setIsLookupModalOpen(true);
-            }}
-            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 text-xs font-mono text-neutral-300 hover:border-neutral-700 hover:bg-neutral-800 transition-colors"
-            title="Track ticket by reference ID"
+            onClick={() => handleTabChange('rewards')}
+            className="flex items-center space-x-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs text-amber-300 hover:bg-amber-500/20 transition-all shadow"
+            title="Click to redeem points"
           >
-            <Search className="h-3.5 w-3.5 text-neutral-400" />
-            <span className="hidden sm:inline">Track</span>
-            <kbd className="hidden md:inline rounded bg-neutral-800 px-1 py-0.2 font-sans text-[10px] text-neutral-400">
-              BDQ#
-            </kbd>
+            <Coins className="h-4 w-4 text-amber-400" />
+            <div className="flex items-baseline space-x-1 font-mono">
+              <span className="font-extrabold text-sm">{userPoints}</span>
+              <span className="text-[10px] uppercase font-sans text-amber-400/80">pts</span>
+            </div>
+            <span className="hidden sm:inline-block rounded bg-amber-400/20 px-1.5 py-0.2 text-[9px] font-bold uppercase text-amber-300">
+              Redeem
+            </span>
           </button>
 
-          {/* Citizen Karma Badge */}
-          <div
-            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg border border-amber-500/20 bg-amber-500/10 text-xs font-medium text-amber-300"
-            title="Your current Civic Karma points"
-          >
-            <Award className="h-3.5 w-3.5 text-amber-400" />
-            <span className="font-mono font-semibold">{userKarma}</span>
-            <span className="hidden sm:inline text-amber-400/80 text-[11px]">pts</span>
-          </div>
-
-          {/* Primary Action: Snap & Report */}
+          {/* Quick Scan Action */}
           <button
-            onClick={() => {
-              sound.playClick();
-              setIsReportModalOpen(true);
-            }}
-            className="flex items-center space-x-1.5 rounded-xl bg-orange-600 px-3.5 py-2 text-xs font-semibold text-white shadow-lg shadow-orange-950/50 hover:bg-orange-500 active:scale-95 transition-all border border-orange-400/30"
+            onClick={() => handleTabChange('scanner')}
+            className="flex items-center space-x-1.5 rounded-xl bg-orange-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-orange-500 shadow-lg shadow-orange-950/40 active:scale-95 transition-all"
           >
-            <Camera className="h-3.5 w-3.5" />
-            <span>Snap & Report</span>
+            <Scan className="h-3.5 w-3.5" />
+            <span>Scan Issue</span>
           </button>
         </div>
       </div>
 
-      {/* Mobile Sub-Navigation Bar */}
-      <div className="flex lg:hidden overflow-x-auto border-t border-neutral-800/60 bg-neutral-950/70 px-4 py-2 space-x-2 scrollbar-none">
+      {/* Mobile Bar */}
+      <div className="flex lg:hidden overflow-x-auto border-t border-neutral-800/60 bg-neutral-950/80 px-4 py-2 space-x-2 scrollbar-none">
         {[
-          { id: 'feed', label: 'Civic Radar' },
+          { id: 'scanner', label: 'AI Scanner' },
+          { id: 'feed', label: 'Civic Feed' },
           { id: 'map', label: 'Live Map' },
-          { id: 'quests', label: 'Quests' },
-          { id: 'food', label: 'Food Hygiene' },
-          { id: 'community', label: 'Micro-Drives' },
-          { id: 'leaderboard', label: 'Champions' }
+          { id: 'rewards', label: 'Redeem Store' },
+          { id: 'activities', label: 'Fun & Quests' },
+          { id: 'track', label: 'Track Ticket' }
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => handleTabChange(tab.id)}
-            className={`whitespace-nowrap px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+            className={`whitespace-nowrap px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
               activeTab === tab.id
-                ? 'bg-neutral-800 text-amber-400 border border-neutral-700'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-orange-600 text-white'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
             {tab.label}

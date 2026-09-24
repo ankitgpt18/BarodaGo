@@ -141,7 +141,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ onSelectIssue })
                     </div>
 
                     <img
-                      src={issue.status === 'resolved' && issue.afterImageUrl ? issue.afterImageUrl : issue.beforeImageUrl}
+                      src={issue.status === 'resolved' && issue.afterImageUrl ? issue.afterImageUrl : issue.imageUrl}
                       alt={issue.title}
                       className="h-28 w-full rounded-md object-cover mb-2"
                     />
