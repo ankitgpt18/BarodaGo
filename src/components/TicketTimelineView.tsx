@@ -170,7 +170,7 @@ export const TicketTimelineView: React.FC<TicketTimelineViewProps> = ({ initialC
           {/* Photos Comparison */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1.5">
-              <div className="text-xs font-mono uppercase text-neutral-400">Initial Citizen AI Scan</div>
+              <div className="text-xs font-mono uppercase text-neutral-400">Initial Citizen Photo Report</div>
               <div className="relative h-60 w-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950">
                 <img src={selectedIssue.imageUrl} alt="Initial defect" className="h-full w-full object-cover" />
                 <div className="absolute top-2 left-2 rounded bg-black/80 px-2 py-0.5 text-[10px] font-bold text-rose-300 border border-rose-900">

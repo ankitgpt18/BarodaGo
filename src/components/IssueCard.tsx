@@ -7,7 +7,7 @@ import {
   ArrowUpRight,
   ShieldCheck,
   AlertTriangle,
-  Sparkles,
+  CheckCircle2,
   User
 } from 'lucide-react';
 import { Issue } from '../types';
@@ -51,9 +51,9 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, onOpenDetails }) =>
         );
       case 'ai_verified':
         return (
-          <span className="inline-flex items-center space-x-1 rounded-md bg-cyan-950/80 px-2 py-0.5 text-[11px] font-semibold text-cyan-300 border border-cyan-700/60">
-            <Sparkles className="h-2.5 w-2.5 mr-0.5" />
-            <span>AI Verified</span>
+          <span className="inline-flex items-center space-x-1 rounded-md bg-emerald-950/80 px-2 py-0.5 text-[11px] font-semibold text-emerald-300 border border-emerald-700/60">
+            <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" />
+            <span>Triage Verified</span>
           </span>
         );
       case 'reported':
@@ -109,8 +109,8 @@ export const IssueCard: React.FC<IssueCardProps> = ({ issue, onOpenDetails }) =>
           />
 
           {issue.aiAnalysis && (
-            <div className="absolute top-2 left-2 rounded-md bg-black/80 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono text-cyan-300 border border-cyan-800/60">
-              AI Conf: {issue.aiAnalysis.confidence.toFixed(1)}%
+            <div className="absolute top-2 left-2 rounded-md bg-black/80 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono text-emerald-300 border border-emerald-800/60">
+              Inspection: {issue.aiAnalysis.confidence.toFixed(1)}% Match
             </div>
           )}
 
