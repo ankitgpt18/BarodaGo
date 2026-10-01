@@ -59,12 +59,20 @@
 | :--- | :--- | :--- |
 | `GET` | `/health` | Liveness & readiness probe for Kubernetes / Docker |
 | `GET` | `/metrics` | Prometheus metrics scrape target (`uptime`, `heap`, `active_wards`) |
+| `POST` | `/api/v1/auth/request-otp` | Request 6-digit OTP code for citizen/officer authentication |
+| `POST` | `/api/v1/auth/verify-otp` | Verify OTP and mint stateless JWT Bearer token |
+| `GET` | `/api/v1/auth/me` | Authenticated profile lookup (`Bearer <JWT>`) |
 | `GET` | `/api/v1/wards` | List all 19 VMC wards with boundaries & executive engineers |
 | `POST` | `/api/v1/wards/resolve` | Resolve VMC ward for coordinate `{ latitude, longitude }` |
 | `POST` | `/api/v1/incidents` | Report new civic defect (auto-deduplicated within 25m) |
 | `GET` | `/api/v1/incidents` | Query active incidents with category, ward, and search filters |
 | `GET` | `/api/v1/incidents/:code` | Retrieve single ticket with chronological municipal audit log |
 | `POST` | `/api/v1/incidents/:code/resolve` | Ward engineer resolution with photographic proof |
+| `POST` | `/api/v1/feedback` | Citizen verification rating (1-5★); re-opens ticket on dissatisfaction |
+| `GET` | `/api/v1/feedback/:code` | Feedback and dispute audit history for ticket |
+| `GET` | `/api/v1/feedback/contractors/scorecards` | Public municipal contractor quality ratings & premature failure stats |
+| `POST` | `/api/v1/webhooks/whatsapp` | Headless WhatsApp/Telegram bot intake with instant formatted reply |
+| `GET` | `/api/v1/stream/events` | Server-Sent Events (SSE) live municipal dispatch wire |
 | `GET` | `/api/v1/rewards/catalog` | View municipal rewards catalog |
 | `POST` | `/api/v1/rewards/redeem` | Atomically redeem points for QR voucher pass |
 | `GET` | `/api/v1/ledger/:phone` | Full citizen account balance & immutable audit statement |
