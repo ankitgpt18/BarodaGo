@@ -9,7 +9,8 @@ import {
   Search,
   Volume2,
   VolumeX,
-  Coins
+  Coins,
+  Compass
 } from 'lucide-react';
 import { useCivicData } from '../context/CivicDataContext';
 import { sound } from '../utils/sound';
@@ -28,12 +29,13 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   } = useCivicData();
 
   const navItems = [
-    { id: 'report', label: 'Report Issue', icon: Camera },
-    { id: 'feed', label: 'City Feed', icon: Activity },
-    { id: 'map', label: 'Live Map', icon: MapPin },
+    { id: 'overview', label: 'Overview', icon: Compass },
+    { id: 'report', label: 'Report Defect', icon: Camera },
+    { id: 'feed', label: 'City Radar', icon: Activity },
+    { id: 'map', label: '19 Wards GIS', icon: MapPin },
     { id: 'rewards', label: 'Redeem Perks', icon: Gift },
-    { id: 'activities', label: 'Quests & Games', icon: Sparkles },
-    { id: 'track', label: 'Track Ticket', icon: Search }
+    { id: 'activities', label: 'Civic Quests', icon: Sparkles },
+    { id: 'track', label: 'Audit Trail', icon: Search }
   ];
 
   const handleTabChange = (tab: string) => {
@@ -93,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         {/* Brand */}
         <div
-          onClick={() => handleTabChange('report')}
+          onClick={() => handleTabChange('overview')}
           className="flex items-center space-x-3 cursor-pointer group"
         >
           <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white font-black text-sm tracking-tight shadow-lg shadow-orange-950/40 border border-orange-400/30 group-hover:scale-105 transition-transform">

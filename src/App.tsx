@@ -10,6 +10,7 @@ import { RewardsRedemptionStore } from './components/RewardsRedemptionStore';
 import { CivicActivitiesSection } from './components/CivicActivitiesSection';
 import { TicketTimelineView } from './components/TicketTimelineView';
 import { IssueDetailsModal } from './components/IssueDetailsModal';
+import { LandingPage } from './components/LandingPage';
 import { Footer } from './components/Footer';
 import { IssueStatus } from './types';
 import {
@@ -24,7 +25,7 @@ import {
 import { sound } from './utils/sound';
 
 const MainAppContent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('report');
+  const [activeTab, setActiveTab] = useState<string>('overview');
   const [trackingTargetCode, setTrackingTargetCode] = useState<string>('VMC-BDQ-8921');
 
   const {
@@ -62,6 +63,21 @@ const MainAppContent: React.FC = () => {
 
       {/* Main Container */}
       <main className="flex-1">
+        {/* Tab 0: Flagship SaaS Landing Page (CyFocus / TwelveMei / CoolFix / Keyvo) */}
+        {activeTab === 'overview' && (
+          <LandingPage
+            onNavigateTab={(tab) => {
+              sound.playClick();
+              setActiveTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onTrackTicket={(code) => {
+              handleNavigateToTrack(code);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        )}
+
         {/* Tab 1: Instant Grievance Reporting Console */}
         {activeTab === 'report' && (
           <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 space-y-10">
