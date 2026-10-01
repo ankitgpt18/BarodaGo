@@ -29,7 +29,7 @@ export class IncidentService {
   public static initSeed() {
     if (this.incidents.size > 0) return;
 
-    this.createIncident({
+    const inc1 = this.createIncident({
       citizenPhone: '+91 98250 11223',
       citizenName: 'Ankit Gupta',
       imageUrl: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=1200&q=80',
@@ -39,8 +39,14 @@ export class IncidentService {
       landmark: 'RC Dutt Road, Opp. Inox Cinema, Alkapuri',
       userNotes: 'Dangerous pothole right in the center lane causing evening two-wheeler swerving.'
     });
+    inc1.incident.trackingNumber = 'VMC-BDQ-8921';
+    this.resolveIncident(
+      'VMC-BDQ-8921',
+      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80',
+      'Rapid bitumen patch completed by Ward 1 Rapid Bitumen Squad.'
+    );
 
-    this.createIncident({
+    const inc2 = this.createIncident({
       citizenPhone: '+91 97129 44556',
       citizenName: 'Priya Dave',
       imageUrl: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?auto=format&fit=crop&w=1200&q=80',
@@ -50,8 +56,9 @@ export class IncidentService {
       landmark: 'Akota-Dandia Bazar Flyover Ramp',
       userNotes: 'Herd of cattle stationary on fast descent ramp.'
     });
+    inc2.incident.trackingNumber = 'VMC-BDQ-7102';
 
-    this.createIncident({
+    const inc3 = this.createIncident({
       citizenPhone: '+91 99241 88990',
       citizenName: 'Sanjay Shah',
       imageUrl: 'https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=1200&q=80',
@@ -61,6 +68,7 @@ export class IncidentService {
       landmark: 'Bahucharaji Road, Near Amrapali Complex, Karelibaug',
       userNotes: 'Sparking wire hanging at eye level after storm.'
     });
+    inc3.incident.trackingNumber = 'VMC-BDQ-9240';
   }
 
   /**

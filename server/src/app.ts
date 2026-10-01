@@ -7,13 +7,23 @@ import { wardsRouter } from './routes/wards.js';
 import { rewardsRouter } from './routes/rewards.js';
 import { ledgerRouter } from './routes/ledger.js';
 import { healthRouter, metricsRouter } from './routes/health.js';
+import { authRouter } from './routes/auth.js';
+import { feedbackRouter } from './routes/feedback.js';
+import { webhooksRouter } from './routes/webhooks.js';
+import { streamRouter } from './routes/stream.js';
 import { IncidentService } from './services/incidentService.js';
+import { ContractorQualityService } from './services/contractorQualityService.js';
+import { SlaEscalationService } from './services/slaEscalationService.js';
 
 export function createApp(): Express {
   const app = express();
 
-  // Initialize seed data for Vadodara demo tickets
+  // Initialize seed data for Vadodara demo tickets & contractors
   IncidentService.initSeed();
+  ContractorQualityService.initSeed();
+
+  // Start autonomous SLA escalation watchdog (runs every 30s)
+  SlaEscalationService.startEscalationWorker(30);
 
   // Security Headers
   app.use(
@@ -27,7 +37,12 @@ export function createApp(): Express {
     cors({
       origin: '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID', 'X-Idempotency-Key']
+      allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Correlation-ID',
+        'X-Idempotency-Key'
+      ]
     })
   );
 
@@ -47,10 +62,14 @@ export function createApp(): Express {
       endpoints: {
         health: '/health',
         metrics: '/metrics',
+        auth: '/api/v1/auth',
         incidents: '/api/v1/incidents',
         wards: '/api/v1/wards',
         rewards: '/api/v1/rewards',
-        ledger: '/api/v1/ledger/:phone'
+        ledger: '/api/v1/ledger/:phone',
+        feedback: '/api/v1/feedback',
+        webhooks: '/api/v1/webhooks/whatsapp',
+        stream: '/api/v1/stream/events'
       }
     });
   });
@@ -58,10 +77,14 @@ export function createApp(): Express {
   // Mount Core Domain Routers
   app.use('/health', healthRouter);
   app.use('/metrics', metricsRouter);
+  app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/incidents', incidentsRouter);
   app.use('/api/v1/wards', wardsRouter);
   app.use('/api/v1/rewards', rewardsRouter);
   app.use('/api/v1/ledger', ledgerRouter);
+  app.use('/api/v1/feedback', feedbackRouter);
+  app.use('/api/v1/webhooks', webhooksRouter);
+  app.use('/api/v1/stream', streamRouter);
 
   // 404 Handler
   app.use((_req: Request, res: Response) => {
