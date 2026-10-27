@@ -1,245 +1,195 @@
 import React, { useState } from 'react';
 import { CivicDataProvider, useCivicData } from './context/CivicDataContext';
-import { Navbar } from './components/Navbar';
-import { HeroSection } from './components/HeroSection';
-import { IssueReportSection } from './components/IssueReportSection';
-import { BeforeAfterSlider } from './components/BeforeAfterSlider';
-import { IssueCard } from './components/IssueCard';
-import { InteractiveMap } from './components/InteractiveMap';
-import { RewardsRedemptionStore } from './components/RewardsRedemptionStore';
-import { CivicActivitiesSection } from './components/CivicActivitiesSection';
-import { TicketTimelineView } from './components/TicketTimelineView';
-import { IssueDetailsModal } from './components/IssueDetailsModal';
-import { LandingPage } from './components/LandingPage';
-import { Footer } from './components/Footer';
-import { IssueStatus } from './types';
-import {
-  Activity,
-  Filter,
-  Layers,
-  ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
-  HardHat
-} from 'lucide-react';
+import { ThemeProvider } from './context/ThemeContext';
+import { PhoneShell } from './components/layout/PhoneShell';
+import { TopBar } from './components/layout/TopBar';
+import { BottomNav, TabId } from './components/layout/BottomNav';
+import { HomeScreen } from './components/screens/HomeScreen';
+import { MapScreen } from './components/screens/MapScreen';
+import { ScanReportScreen } from './components/screens/ScanReportScreen';
+import { ImpactScreen } from './components/screens/ImpactScreen';
+import { ProfileScreen } from './components/screens/ProfileScreen';
+import { MyReportsScreen } from './components/screens/MyReportsScreen';
+import { TicketTrackingScreen } from './components/screens/TicketTrackingScreen';
+import { NotificationsScreen } from './components/screens/NotificationsScreen';
+import { AreaSwitcherModal } from './components/modals/AreaSwitcherModal';
+import { IssueDetailModal } from './components/modals/IssueDetailModal';
+import { Issue } from './types';
 import { sound } from './utils/sound';
+import AppColors from './constants/colors';
 
 const MainAppContent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('overview');
-  const [trackingTargetCode, setTrackingTargetCode] = useState<string>('VMC-BDQ-8921');
+  const [currentTab, setCurrentTab] = useState<TabId | 'track' | 'notifications' | 'my-reports'>('home');
+  const [trackingTargetCode, setTrackingTargetCode] = useState<string>('BG-24817');
+  const [isWardPickerOpen, setIsWardPickerOpen] = useState(false);
+  const [selectedIssueForModal, setSelectedIssueForModal] = useState<Issue | null>(null);
 
-  const {
-    filteredIssues,
-    selectedStatus,
-    setSelectedStatus,
-    activeIssue,
-    setActiveIssue,
-    selectedCategory,
-    setSelectedCategory,
-    selectedWard,
-    setSelectedWard,
-    searchQuery,
-    setSearchQuery
-  } = useCivicData();
+  const [currentWardName, setCurrentWardName] = useState('Alkapuri, Ward 9');
+  const [currentWardSubtext, setCurrentWardSubtext] = useState('Ward 9 · Central Vadodara');
+
+  const { setSelectedWard } = useCivicData();
+
+  const handleTabChange = (tab: TabId) => {
+    sound.playClick();
+    setCurrentTab(tab);
+  };
 
   const handleNavigateToTrack = (code: string) => {
     sound.playClick();
     setTrackingTargetCode(code);
-    setActiveTab('track');
+    setCurrentTab('track');
   };
 
-  const statusOptions: Array<{ id: IssueStatus | 'all'; label: string }> = [
-    { id: 'all', label: 'All Incidents' },
-    { id: 'ai_verified', label: 'Triage Verified' },
-    { id: 'in_progress', label: 'Crew On-Site' },
-    { id: 'dispatched', label: 'Work Order Issued' },
-    { id: 'resolved', label: 'Resolved & Audited' }
-  ];
+  const handleSelectIssue = (issue: Issue) => {
+    sound.playClick();
+    setSelectedIssueForModal(issue);
+  };
+
+  const handleWardSelect = (ward: string, precinct: string) => {
+    setCurrentWardName(ward);
+    setCurrentWardSubtext(precinct);
+    const wardClean = ward.split(',')[0].trim();
+    setSelectedWard(wardClean);
+  };
+
+  const showTopBar = currentTab !== 'track' && currentTab !== 'notifications';
+  const showBottomNav = currentTab !== 'track';
 
   return (
-    <div className="min-h-screen bg-[#080B11] text-neutral-100 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
-      {/* Top Floating Island Navigation */}
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <PhoneShell>
+      {/* 1. Sayaji Civic Top Bar (Mockup #9) */}
+      {showTopBar && (
+        <TopBar
+          currentWard={currentWardName}
+          wardSubtext={currentWardSubtext}
+          coins={420}
+          unreadNotifications={3}
+          onOpenWardPicker={() => setIsWardPickerOpen(true)}
+          onOpenNotifications={() => {
+            sound.playClick();
+            setCurrentTab('notifications');
+          }}
+          onOpenProfile={() => {
+            sound.playClick();
+            setCurrentTab('profile');
+          }}
+          onOpenCoinsStore={() => {
+            sound.playClick();
+            setCurrentTab('impact');
+          }}
+        />
+      )}
 
-      {/* Main Container */}
-      <main className="flex-1">
-        {/* Tab 0: Flagship SaaS Landing Page (CyFocus / TwelveMei / CoolFix / Keyvo) */}
-        {activeTab === 'overview' && (
-          <LandingPage
+      {/* 2. Main Phone Screen Canvas */}
+      <main className="flex-1 w-full overflow-y-auto scrollbar-none relative">
+        {/* Tab: Home (Mockup #9 Hero Civic Screen) */}
+        {currentTab === 'home' && (
+          <HomeScreen
+            onSelectIssue={handleSelectIssue}
             onNavigateTab={(tab) => {
-              sound.playClick();
-              setActiveTab(tab);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              if (tab === 'impact') setCurrentTab('impact');
+              if (tab === 'track') handleNavigateToTrack('BG-24817');
             }}
-            onTrackTicket={(code) => {
-              handleNavigateToTrack(code);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onOpenReport={() => setCurrentTab('scan')}
           />
         )}
 
-        {/* Tab 1: Instant Grievance Reporting Console */}
-        {activeTab === 'report' && (
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 space-y-10">
-            <IssueReportSection onNavigateToTrack={handleNavigateToTrack} />
-            <BeforeAfterSlider />
-          </div>
+        {/* Tab: Map (Interactive Vadodara 19 Wards GIS Radar) */}
+        {currentTab === 'map' && (
+          <MapScreen
+            onSelectIssue={handleSelectIssue}
+            onOpenReport={() => setCurrentTab('scan')}
+          />
         )}
 
-        {/* Tab 2: City Feed & Incident Radar */}
-        {activeTab === 'feed' && (
-          <div className="space-y-10 pb-16">
-            <HeroSection
-              onOpenMap={() => setActiveTab('map')}
-              onOpenReport={() => setActiveTab('report')}
-              onOpenTrack={(code) => handleNavigateToTrack(code)}
-            />
-
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 space-y-10">
-              <BeforeAfterSlider />
-
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-3">
-                  <div className="flex items-center space-x-2">
-                    <Activity className="h-4 w-4 text-orange-400" />
-                    <h2 className="font-display font-extrabold text-xl text-white tracking-tight">
-                      Vadodara Live Incident Stream
-                    </h2>
-                    <span className="rounded-full bg-neutral-800 px-2.5 py-0.5 font-mono text-xs text-neutral-300">
-                      {filteredIssues.length} Incidents
-                    </span>
-                  </div>
-
-                  {/* Status Filter Pills */}
-                  <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none">
-                    {statusOptions.map((st) => (
-                      <button
-                        key={st.id}
-                        onClick={() => {
-                          sound.playClick();
-                          setSelectedStatus(st.id);
-                        }}
-                        className={`whitespace-nowrap rounded-xl px-3 py-1 text-xs font-semibold transition-all ${
-                          selectedStatus === st.id
-                            ? 'bg-neutral-200 text-neutral-950 font-bold shadow'
-                            : 'border border-white/[0.06] bg-[#0E131E]/80 text-neutral-400 hover:text-white hover:border-white/[0.14]'
-                        }`}
-                      >
-                        {st.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Filter info banner */}
-                {(selectedCategory !== 'all' || selectedWard !== 'all' || selectedStatus !== 'all' || searchQuery) && (
-                  <div className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-[#0E131E]/60 px-4 py-2.5 text-xs text-neutral-400">
-                    <div className="flex items-center space-x-2">
-                      <Filter className="h-3.5 w-3.5 text-orange-400" />
-                      <span>
-                        Active Filters:{' '}
-                        <strong className="text-white">
-                          {selectedCategory !== 'all' ? selectedCategory : ''}{' '}
-                          {selectedWard !== 'all' ? `Ward ${selectedWard}` : ''}{' '}
-                          {selectedStatus !== 'all' ? selectedStatus : ''}{' '}
-                          {searchQuery ? `"${searchQuery}"` : ''}
-                        </strong>
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        sound.playClick();
-                        setSelectedCategory('all');
-                        setSelectedWard('all');
-                        setSelectedStatus('all');
-                        setSearchQuery('');
-                      }}
-                      className="text-orange-400 hover:underline font-bold text-xs"
-                    >
-                      Reset all filters
-                    </button>
-                  </div>
-                )}
-
-                {/* Incident Cards Grid */}
-                {filteredIssues.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredIssues.map((issue) => (
-                      <IssueCard
-                        key={issue.id}
-                        issue={issue}
-                        onOpenDetails={(i) => {
-                          setActiveIssue(i);
-                        }}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-3xl border border-dashed border-white/[0.08] bg-neutral-900/30 p-12 text-center space-y-3">
-                    <Layers className="h-8 w-8 text-neutral-600 mx-auto" />
-                    <h3 className="text-sm font-bold text-white">No reports match your current filter</h3>
-                    <p className="text-xs text-neutral-400 max-w-sm mx-auto">
-                      Clear your filters or snap an issue to file a direct report.
-                    </p>
-                    <button
-                      onClick={() => setActiveTab('report')}
-                      className="rounded-xl bg-orange-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-orange-500 shadow-md"
-                    >
-                      Snap & Report Issue
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        {/* Tab: Scan (Issue reporting flow mockups #20-#26 & #23) */}
+        {currentTab === 'scan' && (
+          <ScanReportScreen
+            onNavigateToTrack={handleNavigateToTrack}
+            onClose={() => setCurrentTab('home')}
+          />
         )}
 
-        {/* Tab 3: Interactive GIS Map */}
-        {activeTab === 'map' && (
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-6">
-            <InteractiveMap onSelectIssue={(i) => setActiveIssue(i)} />
-          </div>
+        {/* Tab: Impact (Sayaji Karma & Rewards Store) */}
+        {currentTab === 'impact' && (
+          <ImpactScreen onOpenReport={() => setCurrentTab('scan')} />
         )}
 
-        {/* Tab 4: Points & Rewards Redemption Store */}
-        {activeTab === 'rewards' && (
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-            <RewardsRedemptionStore />
-          </div>
+        {/* Tab: Profile (User details & Helpline) */}
+        {currentTab === 'profile' && (
+          <ProfileScreen
+            onOpenMyReports={() => setCurrentTab('my-reports')}
+            onOpenNotifications={() => setCurrentTab('notifications')}
+            onOpenCoinsStore={() => setCurrentTab('impact')}
+          />
         )}
 
-        {/* Tab 5: Fun Civic Activities & Quests */}
-        {activeTab === 'activities' && (
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-            <CivicActivitiesSection />
-          </div>
+        {/* Sub-Screen: My Reports (Mockup #27) */}
+        {currentTab === 'my-reports' && (
+          <MyReportsScreen
+            onSelectTicket={handleNavigateToTrack}
+            onOpenReport={() => setCurrentTab('scan')}
+          />
         )}
 
-        {/* Tab 6: Track Timeline */}
-        {activeTab === 'track' && (
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-            <TicketTimelineView initialCode={trackingTargetCode} />
-          </div>
+        {/* Sub-Screen: Ticket Tracking (Mockup #28) */}
+        {currentTab === 'track' && (
+          <TicketTrackingScreen
+            trackingCode={trackingTargetCode}
+            onBack={() => setCurrentTab('home')}
+          />
+        )}
+
+        {/* Sub-Screen: Notifications Inbox (Mockup #11) */}
+        {currentTab === 'notifications' && (
+          <NotificationsScreen
+            onBack={() => setCurrentTab('home')}
+            onSelectTicket={handleNavigateToTrack}
+          />
         )}
       </main>
 
-      {/* Global Details Modal */}
-      <IssueDetailsModal
-        issue={activeIssue}
-        onClose={() => setActiveIssue(null)}
+      {/* 3. Bottom 5-Tab Navigation (Blinkit pattern + Mockup #9) */}
+      {showBottomNav && (
+        <BottomNav
+          activeTab={
+            currentTab === 'home' || currentTab === 'map' || currentTab === 'scan' || currentTab === 'impact' || currentTab === 'profile'
+              ? currentTab
+              : 'home'
+          }
+          onTabChange={handleTabChange}
+        />
+      )}
+
+      {/* 4. Area / Ward Switcher Modal (All 19 VMC Wards) */}
+      <AreaSwitcherModal
+        isOpen={isWardPickerOpen}
+        onClose={() => setIsWardPickerOpen(false)}
+        currentWard={currentWardName}
+        onSelectWard={handleWardSelect}
       />
 
-      {/* Clean Footer */}
-      <Footer />
-    </div>
+      {/* 5. Public Issue Detail Modal (Mockup #12 & #13) */}
+      <IssueDetailModal
+        issue={selectedIssueForModal}
+        onClose={() => setSelectedIssueForModal(null)}
+        onTrack={(code) => {
+          setSelectedIssueForModal(null);
+          handleNavigateToTrack(code);
+        }}
+      />
+    </PhoneShell>
   );
 };
 
-export default function App() {
+export function App() {
   return (
-    <CivicDataProvider>
-      <MainAppContent />
-    </CivicDataProvider>
+    <ThemeProvider>
+      <CivicDataProvider>
+        <MainAppContent />
+      </CivicDataProvider>
+    </ThemeProvider>
   );
 }
+
+export default App;
