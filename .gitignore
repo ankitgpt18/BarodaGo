@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Design references
+stitch_barodago_civic_app_design.zip
+stitch_barodago_civic_app_design/
