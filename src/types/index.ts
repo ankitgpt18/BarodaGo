@@ -79,6 +79,10 @@ export interface Issue {
     phone: string;
     pointsAwarded: number;
   };
+  trackingCode?: string;
+  ward?: string;
+  mediaCount?: number;
+  commentsCount?: number;
 }
 
 export interface RewardItem {
@@ -148,4 +152,6 @@ export interface WardInfo {
   engineerPhone: string;
   activeIssuesCount: number;
   resolvedThisMonth: number;
+  lat?: number;
+  lng?: number;
 }
