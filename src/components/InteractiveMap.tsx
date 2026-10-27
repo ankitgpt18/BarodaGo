@@ -1,115 +1,154 @@
-import React, { useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Issue } from '../types';
+import { Issue, WardInfo } from '../types';
 import { useCivicData } from '../context/CivicDataContext';
-import { MapPin, Navigation, ThumbsUp, ShieldCheck, AlertTriangle } from 'lucide-react';
-import { CATEGORY_DETAILS } from '../data/mockData';
+import { MapPin, Navigation, ThumbsUp, ShieldCheck, AlertTriangle, ChevronRight } from 'lucide-react';
+import { CATEGORY_DETAILS, VADODARA_WARDS } from '../data/mockData';
 import { sound } from '../utils/sound';
+import AppColors from '../constants/colors';
+import { FontFamily } from '../constants/typography';
+import { useTheme } from '../context/ThemeContext';
 
 interface InteractiveMapProps {
   onSelectIssue: (issue: Issue) => void;
 }
 
-// Custom Leaflet DivIcon generator
+// Controller component to smoothly pan map when ward changes
+const MapRecenter: React.FC<{ center: [number, number]; zoom?: number }> = ({ center, zoom = 14 }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(center, zoom, { duration: 1.2 });
+  }, [center, zoom, map]);
+  return null;
+};
+
+// Custom Leaflet DivIcon with Sayaji Civic aesthetics
 const createCustomIcon = (status: string, urgency: string, category: string) => {
-  let bgColor = '#3b82f6';
-  let ringColor = 'rgba(59, 130, 246, 0.4)';
+  let pinBg = '#163828'; // Banyan Green default
+  let ringBg = 'rgba(22, 56, 40, 0.25)';
 
   if (status === 'resolved') {
-    bgColor = '#10b981';
-    ringColor = 'rgba(16, 185, 129, 0.4)';
+    pinBg = '#065F46'; // Emerald
+    ringBg = 'rgba(6, 95, 70, 0.25)';
   } else if (urgency === 'hazard') {
-    bgColor = '#ef4444';
-    ringColor = 'rgba(239, 68, 68, 0.5)';
+    pinBg = '#D83120'; // Gulal Red
+    ringBg = 'rgba(216, 49, 32, 0.35)';
   } else if (status === 'in_progress') {
-    bgColor = '#f59e0b';
-    ringColor = 'rgba(245, 158, 11, 0.4)';
+    pinBg = '#E69D1E'; // Haldi Gold
+    ringBg = 'rgba(230, 157, 30, 0.3)';
   }
 
-  const categoryColor = CATEGORY_DETAILS[category]?.color || '#ffffff';
-
   const html = `
-    <div style="position: relative; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;">
-      <div style="position: absolute; width: 34px; height: 34px; border-radius: 9999px; background-color: ${ringColor}; animation: pulse 2s infinite;"></div>
-      <div style="position: relative; width: 26px; height: 26px; border-radius: 9999px; background-color: #0b0f17; border: 2px solid ${bgColor}; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);">
-        <div style="width: 8px; height: 8px; border-radius: 9999px; background-color: ${categoryColor};"></div>
+    <div style="position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+      <div style="position: absolute; width: 36px; height: 36px; border-radius: 9999px; background-color: ${ringBg}; animation: pulse 2s infinite;"></div>
+      <div style="position: relative; width: 26px; height: 26px; border-radius: 9999px; background-color: ${pinBg}; border: 2.5px solid #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.25);">
+        <div style="width: 7px; height: 7px; border-radius: 9999px; background-color: #FFFFFF;"></div>
       </div>
     </div>
   `;
 
   return L.divIcon({
     html,
-    className: 'custom-civic-pin',
-    iconSize: [34, 34],
-    iconAnchor: [17, 17],
-    popupAnchor: [0, -18]
+    className: 'sayaji-civic-pin',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -18],
   });
 };
 
 export const InteractiveMap: React.FC<InteractiveMapProps> = ({ onSelectIssue }) => {
-  const { filteredIssues, selectedWard, setSelectedWard, wards, toggleUpvote } = useCivicData();
-  const [mapCenter] = useState<[number, number]>([22.3072, 73.1812]); // Vadodara center
+  const { theme, colors } = useTheme();
+  const { filteredIssues, selectedWard, setSelectedWard, toggleUpvote } = useCivicData();
+  const [mapCenter, setMapCenter] = useState<[number, number]>([22.3072, 73.1812]); // Central Vadodara
+  const [currentZoom, setCurrentZoom] = useState(13);
 
-  const hotspots = [
-    { name: 'Alkapuri / RC Dutt Rd', coords: [22.3105, 73.1704] },
-    { name: 'Sayajigunj / Station', coords: [22.3114, 73.1895] },
-    { name: 'Sursagar Lake / Mandvi', coords: [22.3023, 73.204] },
-    { name: 'Akota / Dandia Bazar', coords: [22.2965, 73.167] },
-    { name: 'Gotri Medical Road', coords: [22.3188, 73.1432] },
-    { name: 'Karelibaug', coords: [22.3245, 73.2045] }
-  ];
+  // Focus on selected ward if matches coordinates
+  const handleWardFocus = (ward: WardInfo) => {
+    sound.playClick();
+    setSelectedWard(ward.name);
+    if (ward.lat && ward.lng) {
+      setMapCenter([ward.lat, ward.lng]);
+      setCurrentZoom(15);
+    }
+  };
 
   return (
-    <div className="flex flex-col space-y-4">
-      {/* Top Map Filter and Navigation Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-neutral-800 bg-[#0F141F] p-4">
-        <div className="flex items-center space-x-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-950/80 border border-sky-800/60 text-sky-400">
-            <Navigation className="h-4 w-4" />
+    <div className="flex flex-col space-y-3 p-3 sm:p-4 transition-colors" style={{ backgroundColor: colors.surface }}>
+      {/* 19 Wards Horizontal Quick-Picker */}
+      <div className="rounded-2xl p-3 shadow-2xs space-y-2" style={{ backgroundColor: colors.surfaceCard, border: `1px solid ${colors.borderLight}` }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <span
+              className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-800"
+              style={{ fontFamily: FontFamily.mono }}
+            >
+              VMC 19 WARDS RADAR
+            </span>
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#DCEEE3] text-[#163828]">
+              All 19 Wards Active
+            </span>
           </div>
-          <div>
-            <h2 className="text-sm sm:text-base font-bold text-white">
-              Vadodara Real-time Civic GIS Map
-            </h2>
-            <p className="text-xs text-neutral-400">
-              Live geocoded reports plotted across municipal boundaries
-            </p>
-          </div>
+          <span className="text-[11px] text-neutral-500 font-medium">
+            Tap ward to fly camera
+          </span>
         </div>
 
-        {/* Hotspot quick jumps */}
-        <div className="flex items-center space-x-2 overflow-x-auto pb-1 max-w-full">
-          <span className="text-[11px] font-mono text-neutral-400 whitespace-nowrap">
-            Focus zone:
-          </span>
-          {hotspots.map((h) => (
-            <button
-              key={h.name}
-              onClick={() => {
-                sound.playClick();
-                setSelectedWard(h.name.split(' ')[0]);
-              }}
-              className="whitespace-nowrap rounded-lg border border-neutral-800 bg-neutral-900/80 px-2.5 py-1 text-xs text-neutral-300 hover:border-neutral-700 hover:text-white transition-colors"
-            >
-              {h.name}
-            </button>
-          ))}
+        {/* Scrollable list of 19 wards */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => {
+              setSelectedWard('all');
+              setMapCenter([22.3072, 73.1812]);
+              setCurrentZoom(13);
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
+              selectedWard === 'all'
+                ? 'bg-[#163828] text-white shadow-2xs'
+                : 'bg-[#FAF8F5] text-neutral-700 border border-[#EFEAE0] hover:bg-[#EFEAE0]'
+            }`}
+            style={{ cursor: 'pointer', border: 'none' }}
+          >
+            All Vadodara
+          </button>
+          {VADODARA_WARDS.map((w) => {
+            const isSelected = selectedWard === w.name;
+            return (
+              <button
+                key={w.wardNumber}
+                onClick={() => handleWardFocus(w)}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all ${
+                  isSelected
+                    ? 'bg-[#163828] text-white shadow-2xs'
+                    : 'bg-[#FAF8F5] text-neutral-700 border border-[#EFEAE0] hover:bg-[#EFEAE0]'
+                }`}
+                style={{ cursor: 'pointer', border: 'none' }}
+              >
+                <span className="opacity-70 font-mono">W{w.wardNumber}</span>
+                <span>{w.name.split(' ')[0]}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Map Viewport Container */}
-      <div className="relative h-[550px] w-full overflow-hidden rounded-2xl border border-neutral-800 shadow-2xl">
+      <div className="relative h-[480px] sm:h-[540px] w-full overflow-hidden rounded-3xl border border-[#EFEAE0] shadow-md bg-[#E8E4DA]">
         <MapContainer
           center={mapCenter}
-          zoom={13}
+          zoom={currentZoom}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
-          {/* CartoDB Dark Matter tiles (clean, high contrast, zero AI slop, developer-grade) */}
+          <MapRecenter center={mapCenter} zoom={currentZoom} />
+
+          {/* CartoDB Voyager tiles - warm, clean, developer-grade OSM tiles */}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            url={theme === 'dark'
+              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+              : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+            }
           />
 
           {filteredIssues.map((issue) => {
@@ -121,14 +160,14 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ onSelectIssue })
                 position={[issue.lat, issue.lng]}
                 icon={icon}
               >
-                <Popup className="custom-leaflet-popup" minWidth={260} maxWidth={320}>
-                  <div className="p-1">
+                <Popup className="sayaji-leaflet-popup" minWidth={260} maxWidth={300}>
+                  <div className="p-1 font-sans">
                     <div className="flex items-center justify-between gap-1 mb-1.5">
                       <span className="text-[10px] font-mono font-bold text-neutral-600 uppercase">
-                        {issue.trackingNumber}
+                        #{issue.trackingNumber || issue.trackingCode || issue.id}
                       </span>
                       <span
-                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${
                           issue.status === 'resolved'
                             ? 'bg-emerald-100 text-emerald-800'
                             : issue.urgency === 'hazard'
@@ -136,14 +175,14 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ onSelectIssue })
                             : 'bg-amber-100 text-amber-800'
                         }`}
                       >
-                        {issue.status.toUpperCase()}
+                        {issue.status.replace('_', ' ')}
                       </span>
                     </div>
 
                     <img
                       src={issue.status === 'resolved' && issue.afterImageUrl ? issue.afterImageUrl : issue.imageUrl}
                       alt={issue.title}
-                      className="h-28 w-full rounded-md object-cover mb-2"
+                      className="h-28 w-full rounded-xl object-cover mb-2 border border-neutral-200"
                     />
 
                     <h4 className="font-bold text-xs text-neutral-900 line-clamp-2 leading-snug mb-1">
@@ -157,9 +196,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ onSelectIssue })
                     <div className="flex items-center justify-between pt-1 border-t border-neutral-200">
                       <button
                         onClick={() => toggleUpvote(issue.id)}
-                        className="flex items-center space-x-1 text-xs text-neutral-700 hover:text-amber-600 font-semibold"
+                        className="flex items-center space-x-1 text-xs text-neutral-700 hover:text-rose-700 font-semibold"
+                        style={{ cursor: 'pointer', background: 'none', border: 'none' }}
                       >
-                        <ThumbsUp className="h-3 w-3" />
+                        <ThumbsUp size={13} />
                         <span>{issue.upvotes}</span>
                       </button>
 
@@ -168,9 +208,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ onSelectIssue })
                           sound.playClick();
                           onSelectIssue(issue);
                         }}
-                        className="text-xs font-semibold text-blue-600 hover:text-blue-800 underline"
+                        className="text-xs font-bold text-[#D83120] hover:underline flex items-center gap-0.5"
+                        style={{ cursor: 'pointer', background: 'none', border: 'none' }}
                       >
-                        Inspect Audit Log &rarr;
+                        <span>Details</span>
+                        <ChevronRight size={13} />
                       </button>
                     </div>
                   </div>
@@ -181,29 +223,36 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ onSelectIssue })
         </MapContainer>
 
         {/* Map Legend Overlay */}
-        <div className="absolute bottom-4 left-4 z-[1000] rounded-xl border border-neutral-800 bg-[#0B0F17]/90 backdrop-blur-md p-3 text-xs shadow-xl text-neutral-300">
-          <div className="font-semibold text-neutral-200 mb-2 text-[11px] uppercase tracking-wider">
-            Marker Legend
+        <div className="absolute bottom-3 left-3 z-[1000] rounded-2xl backdrop-blur-md p-2.5 text-xs shadow-lg" style={{ backgroundColor: theme === 'dark' ? 'rgba(25,36,30,0.95)' : 'rgba(255,255,255,0.95)', border: `1px solid ${colors.borderLight}`, color: colors.textPrimary }}>
+          <div
+            className="font-black text-neutral-900 mb-1.5 text-[10px] uppercase tracking-wider"
+            style={{ fontFamily: FontFamily.mono }}
+          >
+            SAYAJI INCIDENT PINS
           </div>
-          <div className="space-y-1.5 text-[11px]">
-            <div className="flex items-center space-x-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-rose-500/40" />
-              <span>Critical Hazard / Immediate Attention</span>
+          <div className="space-y-1 text-[11px]">
+            <div className="flex items-center space-x-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#D83120]" />
+              <span>Immediate Hazard</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-amber-500/40" />
-              <span>In Progress / Field Crew Dispatched</span>
+            <div className="flex items-center space-x-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#E69D1E]" />
+              <span>Work Dispatched</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/40" />
-              <span>Resolved & Photographically Verified</span>
+            <div className="flex items-center space-x-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#065F46]" />
+              <span>Resolved & Photographed</span>
             </div>
           </div>
         </div>
 
-        {/* Active counter pill */}
-        <div className="absolute top-4 right-4 z-[1000] rounded-xl border border-neutral-800 bg-[#0B0F17]/90 backdrop-blur-md px-3 py-1.5 text-xs font-mono shadow-xl text-neutral-300">
-          <span className="text-amber-400 font-bold">{filteredIssues.length}</span> reports visible in current filter
+        {/* Active counter badge */}
+        <div
+          className="absolute top-3 right-3 z-[1000] rounded-xl backdrop-blur-md px-3 py-1.5 text-xs font-bold shadow-md flex items-center gap-1.5"
+          style={{ fontFamily: FontFamily.mono, backgroundColor: theme === 'dark' ? 'rgba(25,36,30,0.95)' : 'rgba(255,255,255,0.95)', border: `1px solid ${colors.borderLight}`, color: colors.textPrimary }}
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
+          <span>{filteredIssues.length} active incidents</span>
         </div>
       </div>
     </div>
